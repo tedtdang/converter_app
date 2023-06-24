@@ -1,6 +1,7 @@
 import os
 from pathlib import Path as p
 
+import GPUtil
 import ffmpeg
 
 
@@ -29,7 +30,14 @@ class AudioConverter:
             output_stream = ffmpeg.output(input_stream.audio, output_file)
         else:
             output_stream = ffmpeg.output(input_stream, output_file)
-        # Set the codec and format options
-        output_stream = output_stream.global_args('-hwaccel', 'cuvid')
+        # Check for GPU
+        gpus = GPUtil.getGPUs()
+        if len(gpus) > 0:
+            output_stream = output_stream.global_args('-hwaccel', 'cuvid')
+
         # Run the conversion
-        ffmpeg.run(output_stream)
+        try:
+            ffmpeg.run(output_stream, capture_stdout=True, capture_stderr=True)
+            return output_file
+        except ffmpeg.Error as e:
+            raise RuntimeError(f"Failed to convert video to audio: {e.stderr.decode()}") from e
