@@ -19,7 +19,7 @@ print(extension)
 ## Display gif generation parameters once file has been uploaded ##
 if uploaded_files and extension:
     st.subheader('Convert file')
-    conversion_button = st.button('Convert file now!')
+    conversion_button = st.button('Convert file(s) now!')
     if conversion_button:
         for uploaded_file in uploaded_files:
             # Save uploaded file to a temporary file on disk
@@ -35,10 +35,9 @@ if uploaded_files and extension:
                     download_file_name = str(p(uploaded_file.name).with_suffix('').with_suffix(extension))
                     # Add a download button for the converted file
                     with open(converted_file, "rb") as f:
-                        bytes = f.read()
                         st.download_button(
                             label="Download Audio File",
-                            data=bytes,
+                            data=f.read(),
                             file_name=download_file_name,
                             mime=f"audio/{extension.lstrip('.')}"
                         )
@@ -47,4 +46,4 @@ if uploaded_files and extension:
                 else:
                     st.warning("Click the 'Convert' button to convert the video to audio.")
 else:
-    st.warning('👈 Upload a video file')
+    st.warning('👈 Upload video / audio files')
